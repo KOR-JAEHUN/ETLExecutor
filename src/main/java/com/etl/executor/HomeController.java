@@ -2,8 +2,6 @@ package com.etl.executor;
 
 import java.util.Locale;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,8 +14,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 public class HomeController {
 	
-	private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
-	
 	@RequestMapping(value = "/executor", method = RequestMethod.GET)
 	public String home(Locale locale, Model model) {
 		
@@ -27,18 +23,23 @@ public class HomeController {
 	@RequestMapping(value = "/executorStart", method = RequestMethod.GET)
 	@ResponseBody
 	public Boolean executor() {
-		System.out.println("적재 버튼 실행");
-		
-        long startTime = System.currentTimeMillis();
-
-        Executor exe = new Executor();
-        exe.readHadoop();
-        
-        long endTime = System.currentTimeMillis();
-        long time = endTime - startTime;
-        System.out.println("실행시간 =============== " + time/1000.0 + "초");
-		
-		return new Boolean(true);
+		Boolean flag = new Boolean(true);
+		try {
+			System.out.println("적재 버튼 실행");
+			
+	        long startTime = System.currentTimeMillis();
+	
+	        Executor exe = new Executor();
+	        exe.readHadoop();
+	        
+	        long endTime = System.currentTimeMillis();
+	        long time = endTime - startTime;
+	        System.out.println("실행시간 =============== " + time/1000.0 + "초");
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			flag = new Boolean(false);
+		}
+		return flag;
 	}
 	
 	@RequestMapping(value = "/copyLake", method = RequestMethod.GET)

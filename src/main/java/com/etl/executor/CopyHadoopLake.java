@@ -11,18 +11,18 @@ import java.sql.Statement;
  */
 public class CopyHadoopLake {
 	
-	private final String lakeDbNm = "";
+	private final String lakeDbNm = "big_unity"; // lake
 	Statement stmt = null;
 	
 	public void copyLake(String tableNm, String dbNm, Connection conn) throws Exception {
 		try {
 			
-			String sql ="DROP TABLE IF EXISTS " +  dbNm + "." + tableNm + "_bakk";
+			String sql ="DROP TABLE IF EXISTS " +  lakeDbNm + "." + tableNm;
 			System.out.println(sql);
 			stmt = conn.createStatement();
 			stmt.execute(sql);
 			
-			sql = "CREATE TABLE " + dbNm + "." + tableNm + "_bakk" + " AS SELECT * FROM " +  dbNm + "." + tableNm;
+			sql = "CREATE TABLE " + lakeDbNm + "." + tableNm + " AS SELECT * FROM " +  dbNm + "." + tableNm;
 			System.out.println(sql);
 			stmt = conn.createStatement();
 			stmt.execute(sql);

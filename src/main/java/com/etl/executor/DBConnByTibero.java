@@ -26,7 +26,7 @@ public class DBConnByTibero {
 	}
 	
 	public Connection getConnection() throws ClassNotFoundException, SQLException {
-		if(conn == null) {
+		if(conn == null || conn.isClosed()) {
 			ConfigurableApplicationContext ctx = new GenericXmlApplicationContext();
 			final ConfigurableEnvironment env = ctx.getEnvironment();
 			MutablePropertySources propertySources = env.getPropertySources();
