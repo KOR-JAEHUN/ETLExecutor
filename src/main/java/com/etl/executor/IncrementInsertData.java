@@ -17,6 +17,7 @@ public class IncrementInsertData {
 		cal.add(Calendar.DATE, -1);
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		String date = sdf.format(cal.getTime());
+//		date = "2019-05-30";
 		if("NKRDD305".equals(tableNm) || "NKRDD306".equals(tableNm)  || "NKRDD312".equals(tableNm) || "NKRDD212".equals(tableNm) || "NKRDD206".equals(tableNm) || "NKRDD205".equals(tableNm)
 				|| "NKRDD215".equals(tableNm) || "NKRDD204".equals(tableNm) || "NKRDD208".equals(tableNm) || "NKRDM201".equals(tableNm) || "NKRDD315".equals(tableNm)
 				|| "NKRDD311".equals(tableNm) || "NKRDD310".equals(tableNm) || "NKRDD210".equals(tableNm) || "NKRDD309".equals(tableNm) || "NKRDD209".equals(tableNm)
@@ -76,6 +77,18 @@ public class IncrementInsertData {
 			sql = getIncrement_KCDD214_DELList(date, tableNm);
 		}else if("KCDD214".equals(tableNm) && "TMP".equals(type)) {
 			sql = getIncrement_KCDD214TMPList(date, tableNm);
+		}else if("NRF_BIG_SCJNL_INFO_ITG".equals(tableNm) && "DEL".equals(type)) {
+			sql = getIncrement_NRF_BIG_SCJNL_INFO_ITG_DELList(date, tableNm);
+		}else if("NRF_BIG_SCJNL_INFO_ITG".equals(tableNm) && "TMP".equals(type)) {
+			sql = getIncrement_NRF_BIG_SCJNL_INFO_ITGTMPList(date, tableNm);
+		}else if("NRF_BIG_PPR_INFO_ITG".equals(tableNm) && "DEL".equals(type)) {
+			sql = getIncrement_NRF_BIG_PPR_INFO_ITG_DELList(date, tableNm);
+		}else if("NRF_BIG_PPR_INFO_ITG".equals(tableNm) && "TMP".equals(type)) {
+			sql = getIncrement_NRF_BIG_PPR_INFO_ITGTMPList(date, tableNm);
+		}else if("NRF_BIG_PPR_ATHR_INFO_ITG".equals(tableNm) && "DEL".equals(type)) {
+			sql = getIncrement_NRF_BIG_PPR_ATHR_INFO_ITG_DELList(date, tableNm);
+		}else if("NRF_BIG_PPR_ATHR_INFO_ITG".equals(tableNm) && "TMP".equals(type)) {
+			sql = getIncrement_NRF_BIG_PPR_ATHR_INFO_ITGTMPList(date, tableNm);
 		}
 //		System.out.println(sql);
 		return sql;
@@ -181,6 +194,18 @@ public class IncrementInsertData {
 			sql = deleteIncrement_KCDD214DelList();
 		}else if("KCDD214".equals(tableNm) && "TMP".equals(type)) {
 			sql = deleteIncrement_KCDD214TmpList();
+		}else if("NRF_BIG_SCJNL_INFO_ITG".equals(tableNm) && "DEL".equals(type)) {
+			sql = deleteIncrement_NRF_BIG_SCJNL_INFO_ITGDelList();
+		}else if("NRF_BIG_SCJNL_INFO_ITG".equals(tableNm) && "TMP".equals(type)) {
+			sql = deleteIncrement_NRF_BIG_SCJNL_INFO_ITGTmpList();
+		}else if("NRF_BIG_PPR_INFO_ITG".equals(tableNm) && "DEL".equals(type)) {
+			sql = deleteIncrement_NRF_BIG_PPR_INFO_ITGDelList();
+		}else if("NRF_BIG_PPR_INFO_ITG".equals(tableNm) && "TMP".equals(type)) {
+			sql = deleteIncrement_NRF_BIG_PPR_INFO_ITGTmpList();
+		}else if("NRF_BIG_PPR_ATHR_INFO_ITG".equals(tableNm) && "DEL".equals(type)) {
+			sql = deleteIncrement_NRF_BIG_PPR_ATHR_INFO_ITGDelList();
+		}else if("NRF_BIG_PPR_ATHR_INFO_ITG".equals(tableNm) && "TMP".equals(type)) {
+			sql = deleteIncrement_NRF_BIG_PPR_ATHR_INFO_ITGTmpList();
 		}
 		return sql;
 	}
@@ -275,6 +300,37 @@ public class IncrementInsertData {
 	// hive - KCDD214 tmp
 	public String getIncrement_KCDD214TMPList(String date, String tableNm) {
 		return "select * from "+lakeDbNm+"." + tableNm + " where substr(d214_resi_dt,0,10) = '"+date+"' or substr(d214_resu_dt, 0, 10) = '"+date+"'";
+	}
+	
+	// hive - NRF_BIG_SCJNL_INFO_ITG del
+	public String getIncrement_NRF_BIG_SCJNL_INFO_ITG_DELList(String date, String tableNm) {
+		return "SELECT "+tableNm+".AGC_ID, "+tableNm+".RSCHR_REG_NO, "+tableNm+".MNG_NO "+" FROM "+lakeDbNm+"." + tableNm;
+	}
+	
+	// hive - NRF_BIG_SCJNL_INFO_ITG tmp
+	public String getIncrement_NRF_BIG_SCJNL_INFO_ITGTMPList(String date, String tableNm) {
+		return "select * from "+lakeDbNm+"." + tableNm + " where substr(reg_dttm,0,10) = '"+date+"' or substr(mod_dttm, 0, 10) = '"+date+"'";
+	}
+	
+	// hive - NRF_BIG_PPR_INFO_ITG del
+	public String getIncrement_NRF_BIG_PPR_INFO_ITG_DELList(String date, String tableNm) {
+		return "SELECT "+tableNm+".RSCHR_REG_NO, "+tableNm+".MNG_NO "+" FROM "+lakeDbNm+"." + tableNm;
+	}
+	
+	// hive - NRF_BIG_PPR_INFO_ITG tmp
+	public String getIncrement_NRF_BIG_PPR_INFO_ITGTMPList(String date, String tableNm) {
+		return "select * from "+lakeDbNm+"." + tableNm + " where substr(mod_dttm, 0, 10) = '"+date+"'";
+	}
+	
+	// hive - NRF_BIG_PPR_ATHR_INFO_ITG del
+	public String getIncrement_NRF_BIG_PPR_ATHR_INFO_ITG_DELList(String date, String tableNm) {
+		return "SELECT "+tableNm+".RSCHR_REG_NO, "+tableNm+".MNG_NO, "+tableNm+".SEQ_NO, "+tableNm+".PCN_RSCHR_REG_NO, "+tableNm+".M330_CRET_ID, "+tableNm+".D311_ARTI_CRET_ID, "+
+				tableNm+".M310_ARTI_ID, "+tableNm+".REG_DTTM "+" FROM "+lakeDbNm+"." + tableNm;
+	}
+	
+	// hive - NRF_BIG_PPR_ATHR_INFO_ITG tmp
+	public String getIncrement_NRF_BIG_PPR_ATHR_INFO_ITGTMPList(String date, String tableNm) {
+		return "select * from "+lakeDbNm+"." + tableNm + " where substr(reg_dttm,0,10) = '"+date+"' or substr(mod_dttm, 0, 10) = '"+date+"'";
 	}
 	
 	// tibero
@@ -961,7 +1017,7 @@ public class IncrementInsertData {
 	public String deleteIncrement_KCDD214DelList() {
 		return "delete\r\n" + 
 				"from DATAMART.KCDD214\r\n" + 
-				" where M140_SERE_ID || M300_VOL_ISSE_ID || M310_ARTI_ID in \r\n" + 
+				" where M140_SERE_ID || M300_VOL_ISSE_ID || M310_ARTI_ID not in \r\n" + 
 				"(\r\n" + 
 				"select\r\n" + 
 				"b.M140_SERE_ID || b.M300_VOL_ISSE_ID || b.M310_ARTI_ID \r\n" + 
@@ -987,5 +1043,115 @@ public class IncrementInsertData {
 				"and M300_VOL_ISSE_ID = b.M300_VOL_ISSE_ID\r\n" + 
 				"and M310_ARTI_ID = b.M310_ARTI_ID\r\n" + 
 				")";
+	}
+	
+	// tibero
+	public String deleteIncrement_NRF_BIG_SCJNL_INFO_ITGDelList() {
+		return "delete\r\n" + 
+				"from (\r\n" + 
+				" select a.AGC_ID , a.RSCHR_REG_NO , a.MNG_NO\r\n" + 
+				" from DATAMART.NRF_BIG_SCJNL_INFO_ITG a\r\n" + 
+				" where a.RSCHR_REG_NO is not null and a.MNG_NO is not null\r\n" + 
+				" and not exists (  \r\n" + 
+				" 	select 1\r\n" + 
+				"    from DATAMART.NRF_BIG_SCJNL_INFO_ITG_DEL b\r\n" + 
+				"    where b.RSCHR_REG_NO is not null and b.MNG_NO is not null\r\n" + 
+				"    and a.AGC_ID = b.AGC_ID\r\n" + 
+				"    and a.RSCHR_REG_NO = b.RSCHR_REG_NO\r\n" + 
+				"    and a.MNG_NO = b.MNG_NO\r\n" + 
+				"    )\r\n" + 
+				"  )";
+	}
+	
+	// tibero
+	public String deleteIncrement_NRF_BIG_SCJNL_INFO_ITGTmpList() {
+		return "delete\r\n" + 
+				"from (\r\n" + 
+				" select a.AGC_ID , a.RSCHR_REG_NO , a.MNG_NO\r\n" + 
+				" from DATAMART.NRF_BIG_SCJNL_INFO_ITG a\r\n" + 
+				" where a.RSCHR_REG_NO is not null and a.MNG_NO is not null\r\n" + 
+				" and exists (  \r\n" + 
+				" 	select 1\r\n" + 
+				"    from DATAMART.NRF_BIG_SCJNL_INFO_ITG_TMP b\r\n" + 
+				"    where b.RSCHR_REG_NO is not null and b.MNG_NO is not null\r\n" + 
+				"    and a.AGC_ID = b.AGC_ID\r\n" + 
+				"    and a.RSCHR_REG_NO = b.RSCHR_REG_NO\r\n" + 
+				"    and a.MNG_NO = b.MNG_NO\r\n" + 
+				"    )\r\n" + 
+				"  )";
+	}
+	
+	// tibero
+	public String deleteIncrement_NRF_BIG_PPR_INFO_ITGDelList() {
+		return "delete\r\n" + 
+				"from (\r\n" + 
+				" select a.RSCHR_REG_NO , a.MNG_NO\r\n" + 
+				" from DATAMART.NRF_BIG_PPR_INFO_ITG a\r\n" + 
+				" where a.RSCHR_REG_NO is not null and a.MNG_NO is not null\r\n" + 
+				" and not exists (  \r\n" + 
+				" 	select 1\r\n" + 
+				"    from DATAMART.NRF_BIG_PPR_INFO_ITG_DEL b\r\n" + 
+				"    where b.RSCHR_REG_NO is not null and b.MNG_NO is not null\r\n" + 
+				"    and a.RSCHR_REG_NO = b.RSCHR_REG_NO\r\n" + 
+				"    and a.MNG_NO = b.MNG_NO\r\n" + 
+				"    )\r\n" + 
+				"  )";
+	}
+	
+	// tibero
+	public String deleteIncrement_NRF_BIG_PPR_INFO_ITGTmpList() {
+		return "delete\r\n" + 
+				"from (\r\n" + 
+				" select a.RSCHR_REG_NO , a.MNG_NO\r\n" + 
+				" from DATAMART.NRF_BIG_PPR_INFO_ITG a\r\n" + 
+				" where a.RSCHR_REG_NO is not null and a.MNG_NO is not null\r\n" + 
+				" and exists (  \r\n" + 
+				" 	select 1\r\n" + 
+				"    from DATAMART.NRF_BIG_PPR_INFO_ITG_TMP b\r\n" + 
+				"    where b.RSCHR_REG_NO is not null and b.MNG_NO is not null\r\n" + 
+				"    and a.RSCHR_REG_NO = b.RSCHR_REG_NO\r\n" + 
+				"    and a.MNG_NO = b.MNG_NO\r\n" + 
+				"    )\r\n" + 
+				"  )";
+	}
+	
+	// tibero
+	public String deleteIncrement_NRF_BIG_PPR_ATHR_INFO_ITGDelList() {
+		return "delete\r\n" + 
+				"from (\r\n" + 
+				" select 1\r\n" + 
+				" from DATAMART.NRF_BIG_PPR_ATHR_INFO_ITG a\r\n" + 
+				" where a.PCN_RSCHR_REG_NO is not null and a.M330_CRET_ID is not null and a.D311_ARTI_CRET_ID is not null and a.M310_ARTI_ID is not null\r\n" + 
+				"and not exists (  \r\n" + 
+				" 	select 1\r\n" + 
+				"    from DATAMART.NRF_BIG_PPR_ATHR_INFO_ITG_DEL b\r\n" + 
+				"   where  b.PCN_RSCHR_REG_NO is not null and b.M330_CRET_ID is not null and b.D311_ARTI_CRET_ID is not null and b.M310_ARTI_ID is not null\r\n" + 
+				"    and a.RSCHR_REG_NO = b.RSCHR_REG_NO\r\n" + 
+				"    and a.MNG_NO = b.MNG_NO\r\n" + 
+				"    and a.SEQ_NO = b.SEQ_NO\r\n" + 
+				"    and a.PCN_RSCHR_REG_NO = b.PCN_RSCHR_REG_NO\r\n" + 
+				"    and a.M330_CRET_ID = b.M330_CRET_ID\r\n" + 
+				"    and a.D311_ARTI_CRET_ID = b.D311_ARTI_CRET_ID\r\n" + 
+				"    and a.M310_ARTI_ID = b.M310_ARTI_ID\r\n" + 
+				"    and a.REG_DTTM = b.REG_DTTM\r\n" + 
+				"    )\r\n" + 
+				"  )";
+	}
+	
+	// tibero
+	public String deleteIncrement_NRF_BIG_PPR_ATHR_INFO_ITGTmpList() {
+		return "delete\r\n" + 
+				"from (\r\n" + 
+				" select 1\r\n" + 
+				" from DATAMART.NRF_BIG_PPR_ATHR_INFO_ITG a\r\n" + 
+				"where exists (  \r\n" + 
+				" 	select 1\r\n" + 
+				"    from DATAMART.NRF_BIG_PPR_ATHR_INFO_ITG_TMP b\r\n" + 
+				"    where a.RSCHR_REG_NO = b.RSCHR_REG_NO\r\n" + 
+				"    and a.MNG_NO = b.MNG_NO\r\n" + 
+				"    and a.SEQ_NO = b.SEQ_NO\r\n" + 
+				"    and a.REG_DTTM = b.REG_DTTM\r\n" + 
+				"    )\r\n" + 
+				"  )";
 	}
 }

@@ -13,10 +13,9 @@ import java.sql.Statement;
  */
 public class CreateTiberoTable {
 	
-	
-	Statement stmt = null;
-	ResultSet rs = null;
 	public void copyTable(String tableNm, Connection conn) throws Exception {
+		Statement stmt = null;
+		ResultSet rs = null;
 		try {
 			/*
 			 * ctas로 하면 index, pk, fk가 복사 되지 않기때문에 truncate로 변경 
@@ -51,7 +50,7 @@ public class CreateTiberoTable {
 			System.out.println(sql);
 			stmt = conn.createStatement();
 			stmt.execute(sql);
-			
+			stmt.close();
 	        
 		} catch (SQLException e) {
 			throw new Exception(e);
@@ -75,6 +74,10 @@ public class CreateTiberoTable {
 	
 	// 증분 임시테이블
 	public void copyTmpTable(String tableNm, Connection conn) throws Exception {
+		Statement stmt1 = null;
+		Statement stmt2 = null;
+		Statement stmt3 = null;
+		ResultSet rs = null;
 		try {
 			/*
 			 * ctas로 하면 index, pk, fk가 복사 되지 않기때문에 truncate로 변경 
@@ -83,8 +86,8 @@ public class CreateTiberoTable {
 //			String sql ="SELECT count(*) as cnt FROM USER_TABLES WHERE TABLE_NAME = '" + tableNm + "_SCHEMA'";
 			String sql ="SELECT count(*) as cnt FROM USER_TABLES WHERE TABLE_NAME = '" + tableNm + "_TMP'";
 			System.out.println(sql);
-			stmt = conn.createStatement();
-			rs = stmt.executeQuery(sql);
+			stmt1 = conn.createStatement();
+			rs = stmt1.executeQuery(sql);
 			rs.next();
 			int cnt = rs.getInt("cnt");
 			if(cnt > 0) {
@@ -92,16 +95,16 @@ public class CreateTiberoTable {
 //				sql ="DROP TABLE " + tableNm + "_SCHEMA";
 				sql ="DROP TABLE " + tableNm + "_TMP";
 				System.out.println(sql);
-				stmt = conn.createStatement();
-				stmt.execute(sql);
+				stmt2 = conn.createStatement();
+				stmt2.execute(sql);
+				stmt2.close();
 			}
 //			sql = "CREATE TABLE " + tableNm + " AS SELECT * FROM  " + tableNm + "_SCHEMA " + " where 1=2"; // 스키마만 복제
 //			sql = "CREATE TABLE " + tableNm + "_SCHEMA " + " AS SELECT * FROM  " + tableNm + " where 1=2"; // 스키마만 복제
 			sql = "CREATE TABLE " + tableNm + "_TMP " + " AS SELECT * FROM  " + tableNm + " where 1=2"; // 스키마만 복제
 			System.out.println(sql);
-			stmt = conn.createStatement();
-			stmt.execute(sql);
-			
+			stmt3 = conn.createStatement();
+			stmt3.execute(sql);
 			
 //			//String sql ="DROP TABLE " + tableNm;
 //			//String sql ="DROP TABLE " + tableNm + "_SCHEMA";
@@ -109,17 +112,32 @@ public class CreateTiberoTable {
 //			System.out.println(sql);
 //			stmt = conn.createStatement();
 //			stmt.execute(sql);
-			
+			stmt1.close();
+			stmt3.close();
 			
 		} catch (SQLException e) {
 			throw new Exception(e);
 		} finally {
 			try{
-				if( stmt != null ){
-					stmt.close();                
+				if( stmt1 != null ){
+					stmt1.close();                
 				}
 			}catch(Exception ex){
-				stmt = null;
+				stmt1 = null;
+			}
+			try{
+				if( stmt2 != null ){
+					stmt2.close();                
+				}
+			}catch(Exception ex){
+				stmt2 = null;
+			}
+			try{
+				if( stmt3 != null ){
+					stmt3.close();                
+				}
+			}catch(Exception ex){
+				stmt3 = null;
 			}
 			try{
 				if( rs != null ){
@@ -133,26 +151,31 @@ public class CreateTiberoTable {
 	
 	// 삭제를 위한 삭제임시테이블
 	public void copyDelTable(String tableNm, Connection conn) throws Exception {
+		Statement stmt1 = null;
+		Statement stmt2 = null;
+		Statement stmt3 = null;
+		ResultSet rs = null;
 		try {
 			/*
 			 * ctas로 하면 index, pk, fk가 복사 되지 않기때문에 truncate로 변경 
 			 * */
 			String sql ="SELECT count(*) as cnt FROM USER_TABLES WHERE TABLE_NAME = '" + tableNm + "_DEL'";
 			System.out.println(sql);
-			stmt = conn.createStatement();
-			rs = stmt.executeQuery(sql);
+			stmt1 = conn.createStatement();
+			rs = stmt1.executeQuery(sql);
 			rs.next();
 			int cnt = rs.getInt("cnt");
 			if(cnt > 0) {
 				sql ="DROP TABLE " + tableNm + "_DEL";
 				System.out.println(sql);
-				stmt = conn.createStatement();
-				stmt.execute(sql);
+				stmt2 = conn.createStatement();
+				stmt2.execute(sql);
+				stmt2.close();
 			}
 			sql = "CREATE TABLE " + tableNm + "_DEL " + " AS SELECT * FROM  " + tableNm + " where 1=2"; // 스키마만 복제
 			System.out.println(sql);
-			stmt = conn.createStatement();
-			stmt.execute(sql);
+			stmt3 = conn.createStatement();
+			stmt3.execute(sql);
 			
 //			//String sql ="DROP TABLE " + tableNm;
 //			//String sql ="DROP TABLE " + tableNm + "_SCHEMA";
@@ -160,17 +183,31 @@ public class CreateTiberoTable {
 //			System.out.println(sql);
 //			stmt = conn.createStatement();
 //			stmt.execute(sql);
-			
-			
+			stmt1.close();
+			stmt3.close();
 		} catch (SQLException e) {
 			throw new Exception(e);
 		} finally {
 			try{
-				if( stmt != null ){
-					stmt.close();                
+				if( stmt1 != null ){
+					stmt1.close();                
 				}
 			}catch(Exception ex){
-				stmt = null;
+				stmt1 = null;
+			}
+			try{
+				if( stmt2 != null ){
+					stmt2.close();                
+				}
+			}catch(Exception ex){
+				stmt2 = null;
+			}
+			try{
+				if( stmt3 != null ){
+					stmt3.close();                
+				}
+			}catch(Exception ex){
+				stmt3 = null;
 			}
 			try{
 				if( rs != null ){

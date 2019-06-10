@@ -5,9 +5,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class InsertLog {
-	Statement stmt = null;
 	
 	public void insertLog(String dbNm, String tableNm, Connection conn, String startDt, String endDt, String status, int cnt) throws Exception {
+		Statement stmt = null;
 		try {
 			String date = startDt.split(" ")[0];
 			String sql = "insert into ods_batch_hist.ods_batch_stat_2 \r\n" + 

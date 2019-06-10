@@ -244,6 +244,18 @@
 			<systemPath>${project.basedir}/src/main/webapp/WEB-INF/lib/tibero6-jdbc-14.jar</systemPath> 
 		</dependency>
 
+		<dependency>
+			<groupId>org.mongodb</groupId>
+			<artifactId>mongo-java-driver</artifactId>
+			<version>3.9.1</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.springframework.data/spring-data-mongodb -->
+<!-- 		<dependency> -->
+<!-- 			<groupId>org.springframework.data</groupId> -->
+<!-- 			<artifactId>spring-data-mongodb</artifactId> -->
+<!-- 			<version>1.9.1.RELEASE</version> -->
+<!-- 		</dependency> -->
 	
 		<!-- Test -->
 		<dependency>

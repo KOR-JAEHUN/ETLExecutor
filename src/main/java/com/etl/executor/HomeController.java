@@ -30,7 +30,7 @@ public class HomeController {
 	        long startTime = System.currentTimeMillis();
 	
 	        Executor exe = new Executor();
-	        exe.readHadoop();
+	        exe.etlStart();
 	        
 	        long endTime = System.currentTimeMillis();
 	        long time = endTime - startTime;
