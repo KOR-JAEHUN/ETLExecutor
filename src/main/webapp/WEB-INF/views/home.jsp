@@ -47,9 +47,34 @@
 	   		}
 	   	});
 	}
+	
+	function executeCrawl(){
+		if(!confirm("실행하시겠습니까?")) {
+			return false;
+		}
+		
+		$("#crawlBtn").attr("disabled", true);
+		$.ajax({
+	   		url: "<%=request.getContextPath() %>/executeCrawl",
+	   		type: "get",
+	   		dataType: "json",
+	   		contentType: "application/json",
+	   		success: function(data){
+	   			if(data){
+					$("#crawlBtn").attr("disabled", false);
+	   				alert("크롤링 완료");
+	   			}
+	   		},
+	   		error: function(e){
+				$("#crawlBtn").attr("disabled", false);
+	 			alert("크롤링 실패");
+	   		}
+	   	});
+	}
 </script>
 <body>
-	<input type="button" id="startBtn" value="적재 실행" onclick="start();" />
-	<input type="button" id="copyBtn" value="Lake 복제 실행" onclick="copy();" />
+<!-- 	<input type="button" id="startBtn" value="적재 실행" onclick="start();" /> -->
+<!-- 	<input type="button" id="copyBtn" value="Lake 복제 실행" onclick="copy();" /> -->
+	<input type="button" id="crawlBtn" value="크롤링 실행" onclick="executeCrawl();" />
 </body>
 </html>

@@ -21,9 +21,12 @@ import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mongodb.BasicDBObject;
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientOptions;
+import com.mongodb.MongoCredential;
+import com.mongodb.ServerAddress;
 import com.mongodb.client.FindIterable;
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
@@ -41,9 +44,9 @@ public class Executor {
 
         Executor exe = new Executor();
 //        exe.copyTableOdsToLake();
-//        exe.etlStart();
+        exe.etlStart();
 //          exe.createMasterTable();
-        exe.startMongo();
+//        exe.startMongo();
 //        exe.copyHadoopLog();
         
         long endTime = System.currentTimeMillis();
@@ -68,7 +71,8 @@ public class Executor {
 			stmt = conn.createStatement();
 	        
 //	        String sql = "select * from ods_batch_hist.etl_table_list";
-	        String sql = "select * from ods_batch_hist.etl_table_list where table_nm in('TCM_CMN_CD') and type is null";
+//	        String sql = "select * from ods_batch_hist.etl_table_list where table_nm in('TCM_CMN_CD') and type is null";
+			String sql = "select * from ods_batch_hist.etl_table_list where table_nm in('TMN_SBJT_TPI_HR') and type is null";
 //			String sql = "";
 	        if("100.100.100.216".contains(ip)) {
 	        	sql = "select * from ods_batch_hist.etl_table_list where db_nm = 'ods_ernd' or db_nm = 'ods_ofd100' and type is null";
@@ -176,7 +180,7 @@ public class Executor {
 	        
 			stmt = conn.createStatement();
 	        
-	        String sql = "select * from ods_batch_hist.etl_table_list where table_nm in('TCM_CMN_CD') and type is null";
+	        String sql = "select * from ods_batch_hist.etl_table_list where table_nm in('TMN_SBJT_TPI_HR') and type is null";
 //	        String sql = "";
 	        if("100.100.100.216".contains(ip)) {
 	        	sql = "select * from ods_batch_hist.etl_table_list where db_nm = 'ods_ernd' or db_nm = 'ods_ofd100' or db_nm = 'ods_jcr' and type is null";
@@ -291,7 +295,7 @@ public class Executor {
 			 */
 //			String[] tableNmArr = {"NRF_BIG_BOOK_INFO_ITG", "NRF_BIG_RSCHR_INFO_ITG", "NRF_BIG_SCJNL_INFO_ITG", "NRF_BIG_ITL_PPR_RGT_INFO_ITG" , "NRF_BIG_AGC_INFO_ITG", "NRF_BIG_PPR_INFO_ITG"
 //								, "NRF_BIG_PPR_ATHR_INFO_ITG"};
-			tableNmArr = new String[] {"NRF_BIG_PPR_ATHR_INFO_ITG"};
+//			tableNmArr = new String[] {"NRF_BIG_RSCHR_INFO_ITG", "NRF_BIG_BOOK_INFO_ITG"};
 			
 	        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 	        ReadHadoopData hd = new ReadHadoopData();
@@ -458,33 +462,48 @@ public class Executor {
 		List<HashMap<String,String>> list = new ArrayList<HashMap<String,String>>();
 		LinkedHashMap<String, String> hm = null;
 		Connection tconn = null;
+		MongoClient client = null;
 		
 		try{
 			System.out.println("######### Mongo->Tibero 시작 ##########");
 			tconn = DBConnByTibero.getInstacne().getConnection();
 			
-			String id = "root";
-			String password = "nrfbigdata@2019";
-			String tableNm = "NRF_KEYWORDS_BAK";
+			/* 0. Get client */
+			MongoCredential credential = MongoCredential.createCredential("nrfbigdata", "admin", "nrfbigdata2019".toCharArray());
+			client = new MongoClient(Arrays.asList(
+					   new ServerAddress("100.100.100.216", 27017),
+					   new ServerAddress("100.100.100.217", 27017),
+					   new ServerAddress("100.100.100.218", 27017)), credential, MongoClientOptions.builder().build());
 			
-	//		MongoClient create = MongoClients.create("mongodb://root@nrfbigdata@2019@100.100.100.216:27020,100.100.100.217:27020,100.100.100.218:27020");
-			MongoClient create = MongoClients.create("mongodb://localhost:27017");
-			MongoDatabase database = create.getDatabase("bigdata");
-			MongoCollection<Document> collection = database.getCollection("test");
+			/* 1. Connect to DB */
+			MongoDatabase database = client.getDatabase("nrfbigdata");
+			
+			/* 2. Get collection */
+			MongoCollection<Document> collection = database.getCollection("nrf_keywords");
+			
+			/* 3. Create Query Object */
+			long curDate = System.currentTimeMillis();
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+			String date = sdf.format(new Date(curDate));
+			BasicDBObject field = new BasicDBObject();
+			field.put("docdate", date);
+			
+	        /* 4. Get all documents */
+//			FindIterable<Document> docs = collection.find(field).limit(100);
 			FindIterable<Document> docs = collection.find();
 			int i=1;
+			String tableNm = "NRF_KEYWORDS";
 			InsertTiberoData tb = new InsertTiberoData();
+			
+			/* 5. Insert Data to Tibero */
 			for (Document doc : docs) {
+//				System.out.println(doc.toJson());
 				hm = new LinkedHashMap<>();
 				Iterator<Entry<String, Object>> iter = doc.entrySet().iterator();
 				while (iter.hasNext()) {
 					Map.Entry<String, Object> entry = (Map.Entry<String, Object>) iter.next();
 					if(!"_id".equals(entry.getKey())) {
-//						if("DOCID".equals(entry.getKey()) && entry.getValue() == null) {
-//							break;
-//						}else {
-							hm.put(entry.getKey(), (String) entry.getValue());
-//						}
+						hm.put(entry.getKey(), String.valueOf(entry.getValue()));
 					}
 				}
 				list.add(hm);
@@ -496,13 +515,20 @@ public class Executor {
 				 i++;
 			}
 			tb.insertTiberoDataByNoCols(list, tableNm, tconn);
+			client.close();
 			tconn.close();
 		} catch(Exception ex){
 			logger.error(ex.getMessage());
 			System.out.println("######### Mongo->Tibero 실패 ##########");
 			ex.printStackTrace();
 		} finally {
-	        
+			try{
+				if( client != null ){
+					client.close();                
+				}
+			}catch(Exception ex){
+				client = null;
+			}
 	        try{
 	        	if( tconn != null ){
 	        		tconn.close();                
@@ -513,5 +539,6 @@ public class Executor {
 		}
 			
 	}
+
 
 }

@@ -34,6 +34,7 @@ public class ETLScheduler  {
 				exe.createMasterTable();
 				if("100.100.100.218".contains(ip)) {
 					exe.copyHadoopLog();
+					//exe.startMongo();
 				}
 			}
 			
